@@ -499,6 +499,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
 
+    // Escape description for HTML attributes
+    const escapedDescription = details.description.replace(/"/g, '&quot;');
+
     // Create activity tag
     const tagHtml = `
       <span class="activity-tag" style="background-color: ${typeInfo.color}; color: ${typeInfo.textColor}">
@@ -571,16 +574,16 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="share-buttons">
         <span class="share-label">Share:</span>
-        <button class="share-button facebook" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" title="Share on Facebook">
+        <button class="share-button facebook" data-activity="${name}" data-description="${escapedDescription}" data-schedule="${formattedSchedule}" title="Share on Facebook">
           <span class="share-icon">f</span>
         </button>
-        <button class="share-button twitter" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" title="Share on Twitter">
+        <button class="share-button twitter" data-activity="${name}" data-description="${escapedDescription}" data-schedule="${formattedSchedule}" title="Share on Twitter">
           <span class="share-icon">𝕏</span>
         </button>
-        <button class="share-button linkedin" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" title="Share on LinkedIn">
+        <button class="share-button linkedin" data-activity="${name}" data-description="${escapedDescription}" data-schedule="${formattedSchedule}" title="Share on LinkedIn">
           <span class="share-icon">in</span>
         </button>
-        <button class="share-button email" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" title="Share via Email">
+        <button class="share-button email" data-activity="${name}" data-description="${escapedDescription}" data-schedule="${formattedSchedule}" title="Share via Email">
           <span class="share-icon">✉</span>
         </button>
       </div>
@@ -609,14 +612,16 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         const activityName = button.dataset.activity;
         const description = button.dataset.description;
-        const platform = button.classList.contains("facebook")
-          ? "facebook"
-          : button.classList.contains("twitter")
-          ? "twitter"
-          : button.classList.contains("linkedin")
-          ? "linkedin"
-          : "email";
-        handleShare(activityName, description, formattedSchedule, platform);
+        const schedule = button.dataset.schedule;
+        
+        // Determine platform from button classes
+        const platform = ["facebook", "twitter", "linkedin", "email"].find(
+          (p) => button.classList.contains(p)
+        );
+        
+        if (platform) {
+          handleShare(activityName, description, schedule, platform);
+        }
       });
     });
 
@@ -926,12 +931,17 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
 
       case "email":
-        // Email share
+        // Email share using temporary anchor element
         const subject = encodeURIComponent(title);
         const body = encodeURIComponent(
           `${text}\n\nLearn more: ${url}`
         );
-        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+        
+        // Create temporary anchor element and click it
+        const anchor = document.createElement("a");
+        anchor.href = mailtoLink;
+        anchor.click();
         break;
     }
   }

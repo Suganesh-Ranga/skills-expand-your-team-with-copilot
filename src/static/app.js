@@ -302,7 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Format schedule for display - handles both old and new format
+  // Function to format schedule for display - handles both old and new format
   function formatSchedule(details) {
     // If schedule_details is available, use the structured data
     if (details.schedule_details) {
@@ -326,6 +326,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fallback to the string format if schedule_details isn't available
     return details.schedule;
+  }
+
+  // Function to escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   // Function to determine activity type (this would ideally come from backend)
@@ -538,7 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create difficulty badge (only if difficulty is set)
     const difficultyBadge = details.difficulty ? `
       <div class="difficulty-badge">
-        <strong>Level:</strong> ${details.difficulty}
+        <strong>Level:</strong> ${escapeHtml(details.difficulty)}
       </div>
     ` : '';
 

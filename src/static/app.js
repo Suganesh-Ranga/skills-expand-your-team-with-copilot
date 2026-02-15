@@ -330,8 +330,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to escape HTML to prevent XSS
   function escapeHtml(text) {
+    if (text == null) return '';
     const div = document.createElement('div');
-    div.textContent = text;
+    div.textContent = String(text);
     return div.innerHTML;
   }
 
